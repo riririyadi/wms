@@ -1,0 +1,150 @@
+import React from "react";
+import { cilExitToApp, cilFile, cilPlus, cilSave } from "@coreui/icons";
+import CIcon from "@coreui/icons-react";
+import {
+    CModal, CModalBody, CModalHeader,
+    CRow, CCol,
+    CFormInput,
+    CButton,
+    CHeaderDivider,
+    CInputGroup,
+} from "@coreui/react";
+import AzecLOV from "azec_util/AzecLOV";
+import AzecSelect from "azec_util/AzecSelect";
+import {cilMenu} from "@coreui/icons";
+
+export default class FormInput extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            visible: false,
+            data: {
+
+            },
+            detail: {
+                listData: [],
+                rowCount: 0
+            },
+            selectedDivisionName: null
+        };
+        this.refGridDetail = React.createRef();
+        this.refLovDivisionName = React.createRef();
+    }
+
+    static getDerivedStateFromProps(props, state) {
+        if (props.visible && !state.visible) {
+            state.visible = props.visible;
+
+            state.data = {
+                respCode: props.data == undefined ? undefined : props.data.respCode,
+                respName: props.data == undefined ? undefined : props.data.respName,
+                level: props.data == undefined ? undefined : props.data.level,
+            };
+        }
+        return state;
+    }
+
+    componentDidMount() {
+        this._requeryDetail();
+    }
+
+    _requeryDetail() {
+        let listData = [];
+        for (var i = 0; i < 8; i++) {
+            listData.push({
+                locationCode: "LC00" + i,
+                locationName: "Location " + i,
+            });
+        }
+        this.setState({
+            detail: {
+                listData: listData,
+                rowCount: 0
+            }
+        });
+    }
+
+    _closeForm() {
+        this.setState({
+            visible: false
+        });
+        this.props.onClose();
+    }
+
+    render() {
+        return (
+            <CModal visible={this.props.visible} size="lg" backdrop="static"
+                onClose={() => {
+                    this._closeForm();
+                }}
+            >
+                <CModalHeader>
+                    Create New User
+                </CModalHeader>
+                <CModalBody>
+                    <CRow className="mt-2">
+                        <CCol xs={3}>Responsibility Code</CCol>
+                        <CCol>
+                            <CFormInput
+                                size="sm"
+                                type="text"
+                                placeholder="Enter Responsibility Code"
+                                value={this.state.data.respCode == undefined ? "" : this.state.data.respCode}
+                                onChange={(evt) => {
+                                    let data = this.state.data;
+                                    data.respCode = evt.target.value;
+                                    this.setState({
+                                        data: data
+                                    });
+                                }}
+                            />
+                        </CCol>
+                    </CRow>
+                    <CRow className="mt-2">
+                        <CCol xs={3}>Responsibility Name</CCol>
+                        <CCol>
+                            <CInputGroup size="sm">
+                                <CFormInput
+                                    size="sm"
+                                    type="text"
+                                    placeholder="Enter Responsibility Name"
+                                    value={(this.state.data.respName == null ? "" : this.state.data.respName)}
+                                />
+                            </CInputGroup>
+                        </CCol>
+                    </CRow>
+                    <CRow className="mt-2">
+                        <CCol xs={3}>Level</CCol>
+                        <CCol>
+                            <CFormInput
+                                size="sm"
+                                type="number"
+                                placeholder="Enter Level"
+                                value={this.state.data.level == undefined ? "" : this.state.data.level}
+                                onChange={(evt) => {
+                                    let data = this.state.data;
+                                    data.level = evt.target.value;
+                                    this.setState({
+                                        data: data
+                                    });
+                                }}
+                            />
+                        </CCol>
+                    </CRow>
+                    <CHeaderDivider />
+                    <CRow className="mt-2">
+                        <CCol style={{ textAlign: "right" }}>
+                            <CButton className="ms-2"><CIcon icon={cilSave} /> Save</CButton>
+                            <CButton color="secondary" variant="outline" className="ms-2"
+                                onClick={() => {
+                                    this._closeForm();
+                                }}
+                            ><CIcon icon={cilExitToApp} /> Close</CButton>
+                        </CCol>
+                    </CRow>
+                </CModalBody>
+            </CModal>
+        );
+    }
+}
